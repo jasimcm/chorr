@@ -57,23 +57,42 @@ const LeafletMap: React.FC = () => {
   const [mosques, setMosques] = useState<Mosque[]>([]);
 
   useEffect(() => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+  
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        console.log("User Coordinates:", latitude, longitude); // ✅ Check coordinates
+        console.log("User Coordinates:", latitude, longitude);
         setUserLocation([latitude, longitude]);
-
+  
         const mosqueData = await fetchNearbyMosques(latitude, longitude);
         setMosques(mosqueData);
       },
       (error) => {
         console.error("Error fetching location:", error);
-        alert("Error fetching your location. Please ensure GPS is enabled.");
+  
+        // Handle specific errors
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert("Location permission denied. Please allow location access.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable. Try again later.");
+            break;
+          case error.TIMEOUT:
+            alert("Location request timed out. Please try again.");
+            break;
+          default:
+            alert("An unknown error occurred while fetching location.");
+        }
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // Ensures accurate location
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   }, []);
-
+  
  
 
   if (!userLocation) return <p>Loading your location...</p>;
