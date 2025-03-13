@@ -1,10 +1,11 @@
-import LeafletMap from "@/components/LeafletMap";
+// src/app/page.tsx
 
+import LeafletMapWrapper from "@/components/LeafletMapWrapper";
 
 export default function Home() {
   return (
     <div>
-      <LeafletMap/>
+      <LeafletMapWrapper />
     </div>
   );
 }
